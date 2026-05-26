@@ -1,0 +1,65 @@
+services:
+  psql:
+    image: postgres:18
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      PGDATA: "/var/lib/postgresql/18/docker"
+    volumes:
+      - psql:/var/lib/postgresql/18/docker
+    configs:
+      - source: init-db
+        target: /docker-entrypoint-initdb.d/init-db.sql
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: password
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGPASSFILE: /var/lib/pgadmin/pgpass
+    volumes:
+      - pgadmin:/var/lib/pgadmin/
+    configs:
+      - source: servers.json
+        target: /pgadmin4/servers.json
+      - source: pgpass
+        target: /var/lib/pgadmin/pgpass
+        mode: 0600
+        uid: '5050'
+        gid: '5050'
+
+configs:
+  init-db:
+    content: |
+      CREATE DATABASE test;
+  pgpass:
+    content: psql:5432:*:postgres:password
+  servers.json:
+    content: |
+      {
+        "Servers": {
+          "1": {
+            "Group": "Servers",
+            "Name": "Postgres (Docker)",
+            "Host": "psql",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "postgres",
+            "Password": "password",
+            "SavePassword": true,
+            "PassFile": "/var/lib/pgadmin/pgpass",
+            "Shared": true,
+            "SSLMode": "prefer"
+          }
+        }
+      }
+
+volumes:
+  psql: {}
+  pgadmin: {}
