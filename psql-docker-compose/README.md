@@ -23,7 +23,7 @@ When running this command for the first time, it may take a few seconds for the 
 In this directory:
 
 ```shell
-docekr compose down
+docker compose down
 ```
 
 ## Remove the containers & volumes
@@ -31,7 +31,7 @@ docekr compose down
 To remove all containers and volumes, which will remove all data:
 
 ```shell
-docekr compose down --volumes
+docker compose down --volumes
 ```
 
 ## Access via the UI
